@@ -27,6 +27,7 @@ public class Hunveyor {
       msb -= 256;
     }
 
+
     System.out.println("Temp: "+(msb+lsb*0.00625));
     for(byte b : buffer) {
       System.out.println("Address: "+address+" Data : "+ b +" hex 0x"+Integer.toHexString((b & 0xff)));
