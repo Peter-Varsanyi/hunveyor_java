@@ -27,6 +27,26 @@ int map_peripheral(struct bcm2835_peripheral *p)
    return 0;
 }
 
+void select_port(int number) {
+  INP_GPIO(8);
+  OUT_GPIO(8);
+  INP_GPIO(25);
+  OUT_GPIO(25);
+  GPIO_CLR = 1 << 8;
+  GPIO_CLR = 1 << 25; // clear both bits
+  switch(number) {
+    case 1:
+    GPIO_SET = 1 << 8;
+      break;
+    case 2:
+    GPIO_SET = 1 << 25;
+      break;
+    case 3:
+    GPIO_SET = 1 << 8;
+    GPIO_SET = 1 << 25;
+      break;
+  }
+}
 void output(int number) {
   int i;
   int pins[10] = {4,17,22,10,9,11,23,24,25,8}; // raspberry PI named pins
@@ -50,7 +70,7 @@ int main()
     printf("Failed to map the physical GPIO registers into the virtual memory space.\n");
     return -1;
   }
- 
+ select_port(1);
   output(16);
   return 0; 
 }
