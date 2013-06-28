@@ -9,7 +9,8 @@
  
 #define BCM2708_PERI_BASE       0x20000000
 #define GPIO_BASE               (BCM2708_PERI_BASE + 0x200000)	// GPIO controller 
- 
+#define BSC0_BASE     (BCM2708_PERI_BASE + 0x804000)  // I2C controller 
+
 #define BLOCK_SIZE 		(4*1024)
  
 // IO Acces
@@ -20,9 +21,9 @@ struct bcm2835_peripheral {
     volatile unsigned int *addr;
 };
  
-struct bcm2835_peripheral gpio = {GPIO_BASE};
+//struct bcm2835_peripheral gpio = {GPIO_BASE};
  
-extern struct bcm2835_peripheral gpio;  // They have to be found somewhere, but can't be in the header
+//extern struct bcm2835_peripheral gpio;  // They have to be found somewhere, but can't be in the header
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x)
 #define INP_GPIO(g)   *(gpio.addr + ((g)/10)) &= ~(7<<(((g)%10)*3))
@@ -34,9 +35,8 @@ extern struct bcm2835_peripheral gpio;  // They have to be found somewhere, but 
  
 #define GPIO_READ(g)  *(gpio.addr + 13) &= (1<<(g))
 
-#define BSC0_BASE     (BCM2708_PERI_BASE + 0x205000)  // I2C controller 
  
-extern struct bcm2835_peripheral bsc0;  
+//extern struct bcm2835_peripheral bsc0;  
  
 // I2C macros
 #define BSC0_C          *(bsc0.addr + 0x00)
@@ -44,6 +44,9 @@ extern struct bcm2835_peripheral bsc0;
 #define BSC0_DLEN     *(bsc0.addr + 0x02)
 #define BSC0_A          *(bsc0.addr + 0x03)
 #define BSC0_FIFO     *(bsc0.addr + 0x04)
+
+#define CLEAR_FIFO  BSC_C_CLEAR|BSC_C_CLEAR_II
+
  
 #define BSC_C_I2CEN     (1 << 15)
 #define BSC_C_INTR      (1 << 10)
@@ -51,6 +54,7 @@ extern struct bcm2835_peripheral bsc0;
 #define BSC_C_INTD      (1 << 8)
 #define BSC_C_ST        (1 << 7)
 #define BSC_C_CLEAR     (1 << 4)
+#define BSC_C_CLEAR_II (1 << 5)
 #define BSC_C_READ      1
  
 #define START_READ      BSC_C_I2CEN|BSC_C_ST|BSC_C_CLEAR|BSC_C_READ
@@ -69,6 +73,24 @@ extern struct bcm2835_peripheral bsc0;
  
 #define CLEAR_STATUS    BSC_S_CLKT|BSC_S_ERR|BSC_S_DONE
  
+struct bcm2835_peripheral bsc0 = {BSC0_BASE};
+struct bcm2835_peripheral gpio = {GPIO_BASE};
 // I2C Function Prototypes
 void i2c_init();
 void wait_i2c_done();
+
+void dump_bsc_status() {
+
+    unsigned int s = BSC0_S;
+
+    printf("BSC0_S: ERR=%d  RXF=%d  TXE=%d  RXD=%d  TXD=%d  RXR=%d  TXW=%d  DONE=%d  TA=%d\n",
+        (s & BSC_S_ERR) != 0,
+        (s & BSC_S_RXF) != 0,
+        (s & BSC_S_TXE) != 0,
+        (s & BSC_S_RXD) != 0,
+        (s & BSC_S_TXD) != 0,
+        (s & BSC_S_RXR) != 0,
+        (s & BSC_S_TXW) != 0,
+        (s & BSC_S_DONE) != 0,
+        (s & BSC_S_TA) != 0 );
+}

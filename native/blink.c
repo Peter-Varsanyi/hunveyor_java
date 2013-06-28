@@ -32,6 +32,9 @@ void select_port(int number) {
   OUT_GPIO(8);
   INP_GPIO(25);
   OUT_GPIO(25);
+  INP_GPIO(7);
+  OUT_GPIO(7);
+  GPIO_SET = 1 << 7;
   GPIO_CLR = 1 << 8;
   GPIO_CLR = 1 << 25; // clear both bits
   switch(number) {
@@ -46,6 +49,8 @@ void select_port(int number) {
     GPIO_SET = 1 << 25;
       break;
   }
+  GPIO_CLR = 1 << 7;
+
 }
 void output(int number) {
   int i;
@@ -71,6 +76,12 @@ int main()
     return -1;
   }
  select_port(1);
+ sleep(1);
+ select_port(2);
+ sleep(1);
+ select_port(3);
+ sleep(1);
+ select_port(4);
   output(16);
   return 0; 
 }
