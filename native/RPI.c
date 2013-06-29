@@ -68,11 +68,11 @@ void i2c_scan_bus() {
   
   int device;
 
-  for(device = 3; device < 119; device++) {
+  for(device = 3; device < 119; device++) { // range from 0x03-0x77
     if (DEBUG) {
       printf("Testing: %x\n", device);
     }
-    BSC0_A = device; // address 0x4C, configured by registers http://datasheets.maximintegrated.com/en/ds/DS1631-DS1731.pdf
+    BSC0_A = device; // address
 
     BSC0_C = CLEAR_FIFO;
     BSC0_DLEN = 1;            // length: one byte
